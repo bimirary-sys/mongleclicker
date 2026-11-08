@@ -200,6 +200,24 @@ body.open .caption { opacity: 0; transform: translateY(8px); }
 .guide { position: fixed; z-index: 7; left: 50%; top: 42%; transform: translate(-50%, -50%); width: min(290px, calc(100vw - 48px)); padding: 18px 18px 14px; border-radius: 24px;
   background: radial-gradient(120% 90% at 85% 90%, rgba(214, 236, 250, .55), rgba(214, 236, 250, 0) 60%), radial-gradient(90% 80% at 10% 85%, rgba(250, 222, 236, .55), rgba(250, 222, 236, 0) 60%), radial-gradient(80% 70% at 90% 10%, rgba(226, 246, 238, .5), rgba(226, 246, 238, 0) 60%), var(--glass-hi);
   backdrop-filter: blur(22px) saturate(1.4); -webkit-backdrop-filter: blur(22px) saturate(1.4); box-shadow: inset 0 0 0 1px var(--edge), 0 24px 50px -24px var(--shadow); animation: gpop .45s cubic-bezier(.2, 1.4, .4, 1) both; }
+.lockdlg { position: fixed; z-index: 9; left: 50%; top: 44%; transform: translate(-50%, -50%); width: min(300px, calc(100vw - 48px)); padding: 20px 18px 14px; border-radius: 24px; text-align: center;
+  background: radial-gradient(120% 90% at 85% 90%, rgba(214, 236, 250, .55), rgba(214, 236, 250, 0) 60%), radial-gradient(90% 80% at 10% 85%, rgba(250, 222, 236, .55), rgba(250, 222, 236, 0) 60%), var(--glass-hi);
+  backdrop-filter: blur(22px) saturate(1.4); -webkit-backdrop-filter: blur(22px) saturate(1.4); box-shadow: inset 0 0 0 1px var(--edge), 0 24px 50px -24px var(--shadow); animation: gpop .45s cubic-bezier(.2, 1.4, .4, 1) both; }
+.lockdlg .lki { width: 46px; height: 46px; margin: 0 auto 8px; border-radius: 50%; display: grid; place-items: center; background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); font-size: 22px; }
+.lockdlg h3 { margin: 0 0 4px; font-size: 16px; font-weight: 400; color: var(--ink); }
+.lockdlg p { margin: 0 0 14px; font-size: 12.5px; line-height: 1.55; color: var(--ink-soft); }
+.lockdlg .go { width: 100%; height: 40px; border-radius: 14px; font-size: 13.5px; color: #fff; background: var(--accent); box-shadow: 0 8px 18px -10px var(--accent); }
+.lockdlg .go:disabled { opacity: .55; pointer-events: none; }
+.lockdlg .no { margin-top: 6px; width: 100%; height: 32px; font-size: 12.5px; color: var(--ink-soft); }
+.lockscrim { position: fixed; inset: 0; z-index: 8; background: rgba(60, 50, 80, .12); }
+.nm .lk { font-size: .82em; margin-right: 3px; opacity: .75; }
+.nm.locked { opacity: .78; }
+.lockbar { flex: 0 0 100%; display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0 0 6px; padding: 8px 12px; border-radius: 14px; font-size: 12px; color: var(--ink); background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); }
+.lockbar.open { color: var(--ink-soft); background: transparent; box-shadow: none; padding: 2px 12px; }
+.fakead { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; background: #1f1b2b; color: #fff; font-family: var(--f-ui); text-align: center; }
+.fakead b { display: block; font-size: 18px; margin-bottom: 8px; } .fakead span { font-size: 13px; opacity: .7; }
+.fakead i { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 14px); right: 16px; font-style: normal; font-size: 12px; padding: 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, .15); }
+.toast { position: fixed; z-index: 9; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 92px); transform: translateX(-50%); white-space: nowrap; font-size: 12.5px; color: var(--ink); padding: 8px 14px; border-radius: 999px; background: var(--glass-hi); box-shadow: inset 0 0 0 1px var(--edge); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); animation: tipin .45s cubic-bezier(.2, 1.4, .4, 1) both; transition: opacity .4s; }
 .guide.bye { animation: gbye .26s ease-in both; }
 @keyframes gpop { from { opacity: 0; transform: translate(-50%, -46%) scale(.92); } }
 @keyframes gbye { to { opacity: 0; transform: translate(-50%, -52%) scale(.96); } }
@@ -295,6 +313,9 @@ body:not(.ready) #gl { opacity: 0; } #gl { transition: opacity .6s; }
 
 <div class="sheet" id="sheet" aria-hidden="true" role="dialog" aria-label="클리커 고르기"><label class="srch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg><input id="q" type="search" placeholder="클리커 이름으로 찾기" enterkeyhint="search" autocomplete="off" aria-label="클리커 검색"></label><div class="cats" id="cats" role="tablist"></div><div class="subs" id="subs" hidden></div><div class="names" id="names"></div><p class="legal"><a href="about.html">소개 · 문의</a> · <a href="privacy.html">개인정보처리방침</a></p></div>
 <div class="chk" id="chk" hidden role="toolbar" aria-label="클리커 점검 모드"><button id="chkPrev" aria-label="이전 클리커">‹</button><div class="chkTx"><b id="chkN"></b><span id="chkNm"></span></div><button id="chkNext" aria-label="다음 클리커">›</button><button id="chkPlay" aria-label="자동 넘김 멈추기">❚❚</button><button id="chkX" aria-label="점검 모드 끄기">✕</button></div>
+<div class="lockscrim" id="lockScrim" hidden></div>
+<div class="lockdlg" id="lockDlg" role="dialog" aria-modal="true" aria-labelledby="lockT" hidden><div class="lki">🔒</div><h3 id="lockT">잠긴 클리커예요</h3><p id="lockP">광고 한 편을 보면<br>모든 클리커가 24시간 동안 열려요</p><button class="go" id="lockGo">광고 보고 모두 열기</button><button class="no" id="lockNo">다음에 할게요</button></div>
+<div class="toast" id="toast" hidden></div>
 <div class="iostip" id="iostip" hidden>소리가 안 들리면 무음 모드를 꺼 주세요 🔔</div>
 <div class="boot" id="boot" role="status" aria-live="polite"><div class="bootc"><div class="bootdots"><i></i><i></i><i></i></div><p id="bootMsg">몽글몽글 불러오는 중…</p><button id="bootRetry" hidden onclick="location.reload()">다시 불러오기</button></div></div>
 <script>setTimeout(function () { if (window.__mongleReady) return; var m = document.getElementById('bootMsg'), b = document.getElementById('bootRetry'); if (m) m.textContent = '불러오는 데 시간이 걸리고 있어요. 인터넷 연결을 확인해 주세요'; if (b) b.hidden = false; }, 12000);</script>
@@ -302,6 +323,9 @@ body:not(.ready) #gl { opacity: 0; } #gl { transition: opacity .6s; }
 <div class="tip" id="tip" hidden>다른 클리커도 골라보세요<span class="ar">→</span></div>
 <button class="chev" id="chev" aria-label="클리커 고르기" aria-expanded="false" aria-controls="sheet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14.5l6-6 6 6"/></svg></button>
 
+<!-- rewarded ads (AdSense H5 games ads). Put the ca-pub id in content="" once approved; empty = every clicker free -->
+<meta name="mongle-ad-client" content="">
+<script>(function(){var m=document.querySelector('meta[name="mongle-ad-client"]'),c=m?m.content.trim():'';window.adsbygoogle=window.adsbygoogle||[];window.adBreak=window.adConfig=function(o){adsbygoogle.push(o);};if(!c)return;var s=document.createElement('script');s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client='+c;s.setAttribute('data-ad-client',c);s.setAttribute('data-ad-frequency-hint','30s');if(/[?&]adtest/.test(location.search))s.setAttribute('data-adbreak-test','on');document.head.appendChild(s);adConfig({preloadAdBreaks:'on',sound:'on'});})();</script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from 'three';
@@ -2054,6 +2078,53 @@ TAXO.forEach(([mid, , subs]) => subs.forEach(([sn, ids]) => ids.split(' ').forEa
 CLICKERS.filter(d => !ORDER.includes(d)).forEach(d => { d.cat = 'object'; d.sub = '생활소품'; ORDER.push(d); });
 CLICKERS.length = 0; ORDER.forEach(d => CLICKERS.push(d));
 const CATS = TAXO.map(([id, ko]) => [id, ko]);
+
+/* ===================== REWARDED-AD UNLOCK ===================== */
+/* locks switch on only once an AdSense id is in <meta name="mongle-ad-client"> (or ?locktest for a preview with a fake ad).
+   One watched ad opens every locked clicker for 24h on this device. */
+const AD_CLIENT = ((document.querySelector('meta[name="mongle-ad-client"]') || {}).content || '').trim();
+const LOCK_TEST = /[?&]locktest/.test(location.search);
+const LOCK_ON = !!AD_CLIENT || LOCK_TEST;
+const FREE_IDS = new Set(['pizza', 'doghouse', 'starcompact']), UNLOCK_MS = 24 * 3600e3;
+let unlockUntil = 0; try { unlockUntil = +localStorage.getItem('mongle:unlock') || 0; } catch (e) { }
+const passes = new Set(); // one-off passes when no ad could be served
+const allOpen = () => Date.now() < unlockUntil;
+const lockable = d => LOCK_ON && (d.cat === 'basic' ? d.sub === '전체 키보드' : !FREE_IDS.has(d.id));
+const isLocked = d => !!d && lockable(d) && !allOpen() && !passes.has(d.id);
+function toast(msg, ms = 2600) { const t = document.getElementById('toast'); t.textContent = msg; t.hidden = false; t.style.opacity = 1; clearTimeout(toast.to); toast.to = setTimeout(() => { t.style.opacity = 0; setTimeout(() => { t.hidden = true; }, 400); }, ms); }
+function fakeAd() { return new Promise(res => { const o = document.createElement('div'); o.className = 'fakead'; let n = 5; o.innerHTML = `<div><b>광고 (미리보기)</b><span>실제 광고가 이 자리에 나와요</span></div><i>${n}초</i>`; document.body.appendChild(o); const prev = muted; setMuted(true); const iv = setInterval(() => { n--; o.querySelector('i').textContent = n + '초'; if (n <= 0) { clearInterval(iv); o.remove(); setMuted(prev); res('viewed'); } }, 1000); }); }
+/* asks for a rewarded ad; onReady(showAdFn) fires when one is ready to play. resolves 'viewed' | 'dismissed' | 'noad' */
+function requestReward(onReady) {
+  return new Promise(res => {
+    let done = false, ready = false, viewed = false, to = 0; const fin = r => { if (!done) { done = true; clearTimeout(to); res(r); } };
+    if (!AD_CLIENT) { onReady(() => fakeAd().then(fin)); return; }
+    to = setTimeout(() => { if (!ready) fin('noad'); }, 8000); let prev = muted;
+    try {
+      adBreak({ type: 'reward', name: 'unlock_all',
+        beforeAd() { prev = muted; setMuted(true); }, afterAd() { setMuted(prev); },
+        beforeReward(showAdFn) { ready = true; onReady(showAdFn); },
+        adDismissed() { fin('dismissed'); }, adViewed() { viewed = true; fin('viewed'); },
+        adBreakDone() { fin(viewed ? 'viewed' : ready ? 'dismissed' : 'noad'); } });
+    } catch (e) { fin('noad'); }
+  });
+}
+let lockFor = null;
+function closeLock() { $('#lockDlg').hidden = true; $('#lockScrim').hidden = true; lockFor = null; }
+function askUnlock(d, vi = 0) {
+  if (sheetOpen) toggleSheet(false);
+  lockFor = d ? { d, vi } : null; const go = $('#lockGo');
+  $('#lockT').textContent = d ? `${d.ko} 🔒` : '잠긴 클리커 열기';
+  $('#lockP').innerHTML = '광고 한 편을 보면<br>모든 클리커가 24시간 동안 열려요';
+  go.textContent = '광고 불러오는 중…'; go.disabled = true; go.onclick = null;
+  $('#lockDlg').hidden = false; $('#lockScrim').hidden = false;
+  const target = lockFor;
+  requestReward(showAd => { if (lockFor !== target) return; go.disabled = false; go.textContent = '광고 보고 모두 열기'; go.onclick = () => { go.disabled = true; showAd(); }; }).then(r => {
+    if (lockFor !== target && r !== 'viewed') return;
+    if (r === 'viewed') { unlockUntil = Date.now() + UNLOCK_MS; try { localStorage.setItem('mongle:unlock', String(unlockUntil)); } catch (e) { } closeLock(); toast('모든 클리커가 24시간 동안 열렸어요 ✦'); if (target) show(target.d.id, target.vi); renderNames(); }
+    else if (r === 'noad') { if (target) { passes.add(target.d.id); closeLock(); toast('지금은 광고가 없어서 그냥 열어드릴게요'); show(target.d.id, target.vi); } else { closeLock(); toast('지금은 볼 수 있는 광고가 없어요. 잠시 후 다시 해주세요'); } }
+    else { $('#lockP').innerHTML = '광고를 끝까지 보면 열려요<br>다시 해볼까요?'; go.disabled = false; go.textContent = '다시 시도'; go.onclick = () => { const t = lockFor; closeLock(); askUnlock(t && t.d, t && t.vi); }; }
+  });
+}
 const canvas = document.getElementById('gl');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -2134,6 +2205,7 @@ function build(defn, vi = 0) {
 }
 function show(id, vi = 0, instant = false) {
   const d = CLICKERS.find(x => x.id === id) || CLICKERS[0];
+  if (isLocked(d) && !chkOn) { backing = false; askUnlock(d, vi); return; }
   if (!backing && cur && cur.def.id !== d.id) { hist.push([cur.def.id, cur.vi]); if (hist.length > 40) hist.shift(); setBack(); }
   backing = false;
   if (cur && !instant) { pending = { d, vi }; outT = 1e-4; return; }
@@ -2328,7 +2400,7 @@ $('.brand').addEventListener('click', () => { const t = performance.now(); brand
 // touching the clicker to look closer pauses the auto-advance
 document.getElementById('gl').addEventListener('pointerdown', () => { if (chkOn && chkT) chkAuto(false); });
 /* ‹ › beside the caption name: step through every clicker in menu order */
-function stepClicker(dir) { if (chkOn) { chkAuto(false); return chkGo(chkI + dir); } initAudio(); uiTick(); hideTip(); const i = cur ? CLICKERS.findIndex(c => c.id === cur.def.id) : -1; const d = CLICKERS[(i + dir + CLICKERS.length) % CLICKERS.length]; show(d.id, 0); }
+function stepClicker(dir) { if (chkOn) { chkAuto(false); return chkGo(chkI + dir); } initAudio(); uiTick(); hideTip(); const i = cur ? CLICKERS.findIndex(c => c.id === cur.def.id) : -1; let j = i, d; for (let n = 0; n < CLICKERS.length; n++) { j = (j + dir + CLICKERS.length) % CLICKERS.length; d = CLICKERS[j]; if (!isLocked(d)) break; } show(d.id, 0); }
 $('#navPrev').addEventListener('click', () => stepClicker(-1));
 $('#navNext').addEventListener('click', () => stepClicker(1));
 addEventListener('keydown', e => { if (sheetOpen || e.target.closest?.('input, textarea')) return; if (e.key === 'ArrowLeft') stepClicker(-1); else if (e.key === 'ArrowRight') stepClicker(1); });
@@ -2341,13 +2413,15 @@ $('#backBtn').addEventListener('click', () => { if (!hist.length) return; initAu
 function setDrawer(open) { if (!open) hideBackTip(); $('#drawer').classList.toggle('open', open); $('#moreBtn').setAttribute('aria-expanded', open); $('#moreBtn').setAttribute('aria-label', open ? '찜·랜덤박스 접기' : '찜·랜덤박스 펼치기'); }
 $('#moreBtn').addEventListener('click', () => { initAudio(); uiTick(); const open = !$('#drawer').classList.contains('open'); setDrawer(open); if (!open) hideBackTip(); else if (!backTipShown) { backTipShown = true; const t = $('#backTip'); setTimeout(() => { t.hidden = false; t.classList.remove('bye'); backTipTO = setTimeout(hideBackTip, 4500); }, 380); } });
 document.addEventListener('pointerdown', e => { if ($('#drawer').classList.contains('open') && !e.target.closest('.side')) setDrawer(false); });
+$('#lockNo').addEventListener('click', () => { uiTick(); closeLock(); });
+$('#lockScrim').addEventListener('click', closeLock);
 /* random box: rattles, then pops out a random clicker */
 let fromRandom = false, rolling = false; const randBtn = $('#rand');
 randBtn.addEventListener('click', () => {
   if (rolling) return; rolling = true; initAudio(); hideTip(); if (sheetOpen) toggleSheet(false);
   randBtn.classList.remove('shake'); void randBtn.offsetWidth; randBtn.classList.add('shake');
   for (let i = 0; i < 6; i++) setTimeout(() => { uiTick(); try { navigator.vibrate && navigator.vibrate(4); } catch (e) { } }, i * 95);
-  setTimeout(() => { const pool = CLICKERS.filter(d => !cur || d.id !== cur.def.id); const d = pool[(Math.random() * pool.length) | 0]; fromRandom = true; show(d.id, d.variants ? (Math.random() * d.variants.length) | 0 : 0); rolling = false; }, 680);
+  setTimeout(() => { const pool = CLICKERS.filter(d => (!cur || d.id !== cur.def.id) && !isLocked(d)); const d = pool[(Math.random() * pool.length) | 0]; fromRandom = true; show(d.id, d.variants ? (Math.random() * d.variants.length) | 0 : 0); rolling = false; }, 680);
 });
 const subsOf = id => { const t = TAXO.find(t => t[0] === id); return t ? t[2].map(s => s[0]) : []; };
 [['fav', '찜 ♡', () => favs.length], ['recent', '최근', () => recent.length]].reverse().forEach(([id, ko, n]) => { const b = document.createElement('button'); b.className = 'cat special'; b.dataset.cat = id; b.innerHTML = `<span>${ko}</span><small></small>`; b._n = n; b.addEventListener('click', () => { clearSearch(); curCat = id; curSub = null; uiTick(); renderCats(); renderNames(); }); catsEl.appendChild(b); });
@@ -2366,7 +2440,7 @@ function setSubOn(sn) {
 function jumpTo(sn, smooth) {
   const h = namesEl.querySelector(`.shd[data-sub="${CSS.escape(sn)}"]`); if (!h) return;
   spyLock = performance.now() + (smooth ? 700 : 80);
-  namesEl.scrollTo({ top: Math.max(0, h.offsetTop - 2), behavior: smooth ? 'smooth' : 'auto' });
+  namesEl.scrollTo({ top: h === namesEl.querySelector('.shd') ? 0 : Math.max(0, h.offsetTop - 2), behavior: smooth ? 'smooth' : 'auto' });
 }
 namesEl.addEventListener('scroll', () => {
   if (performance.now() < spyLock) { spyLock = Math.max(spyLock, performance.now() + 120); return; }
@@ -2390,11 +2464,17 @@ function renderNames() {
   const multi = groups.length > 1;
   namesEl.innerHTML = '';
   if (special && !groups[0][1].length) { const p = document.createElement('p'); p.className = 'empty-note'; p.textContent = searching ? `'${searchQ.trim()}'에 맞는 클리커가 없어요. 다른 말로 찾아보세요` : curCat === 'fav' ? '아직 찜한 클리커가 없어요. 클리커 이름 옆 ♡를 눌러 담아보세요' : '아직 가지고 논 클리커가 없어요. 하나 골라서 눌러보세요'; namesEl.appendChild(p); }
+  if (LOCK_ON && groups.some(g => g[1].some(lockable))) {
+    const lb = document.createElement(allOpen() ? 'div' : 'button'); lb.className = 'lockbar' + (allOpen() ? ' open' : '');
+    if (allOpen()) { const h = Math.max(1, Math.ceil((unlockUntil - Date.now()) / 3600e3)); lb.textContent = `🔓 모든 클리커가 열려 있어요 · ${h}시간 남음`; }
+    else { lb.textContent = '🔒 광고 한 편 보고 모든 클리커 열기'; lb.addEventListener('click', () => { initAudio(); askUnlock(null); }); }
+    namesEl.appendChild(lb);
+  }
   let i = 0;
   groups.forEach(([sn, list]) => {
     if (multi) { const h = document.createElement('div'); h.className = 'shd'; h.dataset.sub = sn; h.textContent = sn; h.style.setProperty('--i', Math.min(i++, 14)); namesEl.appendChild(h); }
     list.forEach(c => {
-      const b = document.createElement('button'); b.className = 'nm' + (cur && cur.def.id === c.id ? ' on' : ''); b.style.setProperty('--i', Math.min(i++, 14)); b.textContent = c.ko + (favs.includes(c.id) && curCat !== 'fav' ? ' ♥' : '');
+      const b = document.createElement('button'); b.className = 'nm' + (cur && cur.def.id === c.id ? ' on' : ''); b.style.setProperty('--i', Math.min(i++, 14)); b.textContent = c.ko + (favs.includes(c.id) && curCat !== 'fav' ? ' ♥' : ''); if (isLocked(c)) { b.classList.add('locked'); b.insertAdjacentHTML('afterbegin', '<span class="lk">🔒</span>'); }
       b.addEventListener('click', () => { initAudio(); show(c.id, 0); toggleSheet(false); }); namesEl.appendChild(b);
     });
   });
