@@ -206,6 +206,7 @@ body.open .caption { opacity: 0; transform: translateY(8px); }
 .lockdlg .lki { width: 46px; height: 46px; margin: 0 auto 8px; border-radius: 50%; display: grid; place-items: center; background: var(--glass); box-shadow: inset 0 0 0 1px var(--edge); font-size: 22px; }
 .lockdlg h3 { margin: 0 0 4px; font-size: 16px; font-weight: 400; color: var(--ink); }
 .lockdlg p { margin: 0 0 14px; font-size: 12.5px; line-height: 1.55; color: var(--ink-soft); }
+.lockdlg p b { color: var(--ink); font-weight: 400; } .lockdlg .lkn { display: block; margin-top: 8px; font-size: 11px; color: var(--ink-faint); }
 .lockdlg .go { width: 100%; height: 40px; border-radius: 14px; font-size: 13.5px; color: #fff; background: var(--accent); box-shadow: 0 8px 18px -10px var(--accent); }
 .lockdlg .go:disabled { opacity: .55; pointer-events: none; }
 .lockdlg .no { margin-top: 6px; width: 100%; height: 32px; font-size: 12.5px; color: var(--ink-soft); }
@@ -2081,16 +2082,20 @@ const CATS = TAXO.map(([id, ko]) => [id, ko]);
 
 /* ===================== REWARDED-AD UNLOCK ===================== */
 /* locks switch on only once an AdSense id is in <meta name="mongle-ad-client"> (or ?locktest for a preview with a fake ad).
-   One watched ad opens every locked clicker for 24h on this device. */
+   One watched ad opens one category for 24h on this device; the very first ad is a bonus that also opens 음식 클리커 + 전체 키보드. */
 const AD_CLIENT = ((document.querySelector('meta[name="mongle-ad-client"]') || {}).content || '').trim();
 const LOCK_TEST = /[?&]locktest/.test(location.search);
 const LOCK_ON = !!AD_CLIENT || LOCK_TEST;
 const FREE_IDS = new Set(['pizza', 'doghouse', 'starcompact']), UNLOCK_MS = 24 * 3600e3;
-let unlockUntil = 0; try { unlockUntil = +localStorage.getItem('mongle:unlock') || 0; } catch (e) { }
+const GROUP_KO = { kb: '전체 키보드', food: '음식 클리커', animal: '동물 클리커', object: '사물 클리커' }, BONUS = ['food', 'kb'];
+const grpOf = d => d.cat === 'basic' ? 'kb' : d.cat;
+let opens = {}, firstDone = false; try { opens = JSON.parse(localStorage.getItem('mongle:opens')) || {}; firstDone = localStorage.getItem('mongle:firstAd') === '1'; } catch (e) { }
 const passes = new Set(); // one-off passes when no ad could be served
-const allOpen = () => Date.now() < unlockUntil;
+const grpOpen = g => Date.now() < (opens[g] || 0);
 const lockable = d => LOCK_ON && (d.cat === 'basic' ? d.sub === '전체 키보드' : !FREE_IDS.has(d.id));
-const isLocked = d => !!d && lockable(d) && !allOpen() && !passes.has(d.id);
+const isLocked = d => !!d && lockable(d) && !grpOpen(grpOf(d)) && !passes.has(d.id);
+const grpCount = g => CLICKERS.filter(c => lockable(c) && grpOf(c) === g).length;
+const joinKo = gs => gs.map(g => GROUP_KO[g]).join(' + ');
 function toast(msg, ms = 2600) { const t = document.getElementById('toast'); t.textContent = msg; t.hidden = false; t.style.opacity = 1; clearTimeout(toast.to); toast.to = setTimeout(() => { t.style.opacity = 0; setTimeout(() => { t.hidden = true; }, 400); }, ms); }
 function fakeAd() { return new Promise(res => { const o = document.createElement('div'); o.className = 'fakead'; let n = 5; o.innerHTML = `<div><b>광고 (미리보기)</b><span>실제 광고가 이 자리에 나와요</span></div><i>${n}초</i>`; document.body.appendChild(o); const prev = muted; setMuted(true); const iv = setInterval(() => { n--; o.querySelector('i').textContent = n + '초'; if (n <= 0) { clearInterval(iv); o.remove(); setMuted(prev); res('viewed'); } }, 1000); }); }
 /* asks for a rewarded ad; onReady(showAdFn) fires when one is ready to play. resolves 'viewed' | 'dismissed' | 'noad' */
@@ -2100,7 +2105,7 @@ function requestReward(onReady) {
     if (!AD_CLIENT) { onReady(() => fakeAd().then(fin)); return; }
     to = setTimeout(() => { if (!ready) fin('noad'); }, 8000); let prev = muted;
     try {
-      adBreak({ type: 'reward', name: 'unlock_all',
+      adBreak({ type: 'reward', name: 'unlock_category',
         beforeAd() { prev = muted; setMuted(true); }, afterAd() { setMuted(prev); },
         beforeReward(showAdFn) { ready = true; onReady(showAdFn); },
         adDismissed() { fin('dismissed'); }, adViewed() { viewed = true; fin('viewed'); },
@@ -2110,19 +2115,25 @@ function requestReward(onReady) {
 }
 let lockFor = null;
 function closeLock() { $('#lockDlg').hidden = true; $('#lockScrim').hidden = true; lockFor = null; }
-function askUnlock(d, vi = 0) {
+/* d: the clicker that was tapped (or null from the list bar); g: its category key */
+function askUnlock(d, vi = 0, g = d && grpOf(d)) {
   if (sheetOpen) toggleSheet(false);
-  lockFor = d ? { d, vi } : null; const go = $('#lockGo');
-  $('#lockT').textContent = d ? `${d.ko} 🔒` : '잠긴 클리커 열기';
-  $('#lockP').innerHTML = '광고 한 편을 보면<br>모든 클리커가 24시간 동안 열려요';
+  const first = !firstDone, gs = first ? [...new Set([...BONUS, g])] : [g];
+  lockFor = { d, vi, g }; const target = lockFor, go = $('#lockGo');
+  $('#lockT').textContent = d ? `${d.ko} 🔒` : `${GROUP_KO[g]} 🔒`;
+  $('#lockP').innerHTML = first ? `광고 보고 <b>${joinKo(gs)}</b><br>24시간 동안 잠금해제<small class="lkn">다음 카테고리도 언제든지 광고 보고 잠금해제할 수 있어요</small>`
+    : `광고 보고 <b>${GROUP_KO[g]}</b> 모두 잠금해제<small class="lkn">24시간 동안 열려 있어요</small>`;
   go.textContent = '광고 불러오는 중…'; go.disabled = true; go.onclick = null;
   $('#lockDlg').hidden = false; $('#lockScrim').hidden = false;
-  const target = lockFor;
-  requestReward(showAd => { if (lockFor !== target) return; go.disabled = false; go.textContent = '광고 보고 모두 열기'; go.onclick = () => { go.disabled = true; showAd(); }; }).then(r => {
+  requestReward(showAd => { if (lockFor !== target) return; go.disabled = false; go.textContent = '광고 보고 잠금해제'; go.onclick = () => { go.disabled = true; showAd(); }; }).then(r => {
     if (lockFor !== target && r !== 'viewed') return;
-    if (r === 'viewed') { unlockUntil = Date.now() + UNLOCK_MS; try { localStorage.setItem('mongle:unlock', String(unlockUntil)); } catch (e) { } closeLock(); toast('모든 클리커가 24시간 동안 열렸어요 ✦'); if (target) show(target.d.id, target.vi); renderNames(); }
-    else if (r === 'noad') { if (target) { passes.add(target.d.id); closeLock(); toast('지금은 광고가 없어서 그냥 열어드릴게요'); show(target.d.id, target.vi); } else { closeLock(); toast('지금은 볼 수 있는 광고가 없어요. 잠시 후 다시 해주세요'); } }
-    else { $('#lockP').innerHTML = '광고를 끝까지 보면 열려요<br>다시 해볼까요?'; go.disabled = false; go.textContent = '다시 시도'; go.onclick = () => { const t = lockFor; closeLock(); askUnlock(t && t.d, t && t.vi); }; }
+    if (r === 'viewed') {
+      const until = Date.now() + UNLOCK_MS; gs.forEach(k => { opens[k] = until; }); firstDone = true;
+      try { localStorage.setItem('mongle:opens', JSON.stringify(opens)); localStorage.setItem('mongle:firstAd', '1'); } catch (e) { }
+      closeLock(); toast(`${joinKo(gs)} 잠금해제! 24시간 동안 열려 있어요 ✦`, 3200); if (d) show(d.id, vi); renderNames();
+    }
+    else if (r === 'noad') { closeLock(); if (d) { passes.add(d.id); toast('지금은 광고가 없어서 그냥 열어드릴게요'); show(d.id, vi); } else toast('지금은 볼 수 있는 광고가 없어요. 잠시 후 다시 해주세요'); }
+    else { $('#lockP').innerHTML = '광고를 끝까지 보면 열려요<br>다시 해볼까요?'; go.disabled = false; go.textContent = '다시 시도'; go.onclick = () => { closeLock(); askUnlock(d, vi, g); }; }
   });
 }
 const canvas = document.getElementById('gl');
@@ -2464,12 +2475,13 @@ function renderNames() {
   const multi = groups.length > 1;
   namesEl.innerHTML = '';
   if (special && !groups[0][1].length) { const p = document.createElement('p'); p.className = 'empty-note'; p.textContent = searching ? `'${searchQ.trim()}'에 맞는 클리커가 없어요. 다른 말로 찾아보세요` : curCat === 'fav' ? '아직 찜한 클리커가 없어요. 클리커 이름 옆 ♡를 눌러 담아보세요' : '아직 가지고 논 클리커가 없어요. 하나 골라서 눌러보세요'; namesEl.appendChild(p); }
-  if (LOCK_ON && groups.some(g => g[1].some(lockable))) {
-    const lb = document.createElement(allOpen() ? 'div' : 'button'); lb.className = 'lockbar' + (allOpen() ? ' open' : '');
-    if (allOpen()) { const h = Math.max(1, Math.ceil((unlockUntil - Date.now()) / 3600e3)); lb.textContent = `🔓 모든 클리커가 열려 있어요 · ${h}시간 남음`; }
-    else { lb.textContent = '🔒 광고 한 편 보고 모든 클리커 열기'; lb.addEventListener('click', () => { initAudio(); askUnlock(null); }); }
+  const lg = !special && LOCK_ON ? [...new Set(groups.flatMap(g => g[1]).filter(lockable).map(grpOf))] : [];
+  lg.forEach(g => {
+    const on = grpOpen(g), lb = document.createElement(on ? 'div' : 'button'); lb.className = 'lockbar' + (on ? ' open' : '');
+    if (on) { const h = Math.max(1, Math.ceil((opens[g] - Date.now()) / 3600e3)); lb.textContent = `🔓 ${GROUP_KO[g]} 열림 · ${h}시간 남음`; }
+    else { lb.textContent = !firstDone ? `🔒 광고 보고 ${joinKo([...new Set([...BONUS, g])])} 잠금해제` : `🔒 광고 보고 ${GROUP_KO[g]} 잠금해제`; lb.addEventListener('click', () => { initAudio(); askUnlock(null, 0, g); }); }
     namesEl.appendChild(lb);
-  }
+  });
   let i = 0;
   groups.forEach(([sn, list]) => {
     if (multi) { const h = document.createElement('div'); h.className = 'shd'; h.dataset.sub = sn; h.textContent = sn; h.style.setProperty('--i', Math.min(i++, 14)); namesEl.appendChild(h); }
