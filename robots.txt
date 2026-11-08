@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://bimirary-sys.github.io/mongleclicker/sitemap.xml
