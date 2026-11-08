@@ -2450,5 +2450,8 @@ function burst() { if (reduce) return; const b = $('#burst'); b.innerHTML = ''; 
 
 </script>
 
+<div hidden><div id="cpAd" class="cpad"><iframe src="https://ads-partners.coupang.com/widgets.html?id=1047718&template=carousel&trackingCode=AF4687884&subId=&width=360&height=120&tsource=" width="100%" height="120" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" loading="lazy" title="쿠팡 추천 상품"></iframe><p>이 사이트는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p></div></div>
+<style>.cpad{flex:0 0 100%;margin:16px 0 4px}.cpad iframe{display:block;width:100%;height:120px;border:0;border-radius:12px;background:var(--glass-soft)}.cpad p{font-size:10px;color:var(--ink-faint);text-align:center;margin:6px 0 0;line-height:1.45}</style>
+<script>(function(){var ad=document.getElementById('cpAd'),n=document.getElementById('names');if(!ad||!n)return;var mo;function place(){var t=n.querySelector('.tail');if(ad.parentNode===n&&ad.nextSibling===t)return;mo.disconnect();if(t)n.insertBefore(ad,t);else n.appendChild(ad);mo.observe(n,{childList:true});}mo=new MutationObserver(place);mo.observe(n,{childList:true});place();})();</script>
 </body>
 </html>
