@@ -2191,7 +2191,7 @@ const chain = (() => {
 
 /* ---------- layout ---------- */
 let VW = 1, VH = 1;
-function resize() { VW = innerWidth; VH = innerHeight; renderer.setSize(VW, VH, false); camera.aspect = VW / VH; camera.updateProjectionMatrix(); }
+function resize() { VW = innerWidth; VH = renderer.domElement.clientHeight || innerHeight; renderer.setSize(VW, VH, false); camera.aspect = VW / VH; camera.updateProjectionMatrix(); }
 addEventListener('resize', resize); resize();
 function camDist() { const v = THREE.MathUtils.degToRad(camera.fov), h = 2 * Math.atan(Math.tan(v / 2) * camera.aspect); return fitR / Math.sin(Math.min(v, h) / 2) * .94; }
 
@@ -2450,8 +2450,8 @@ function burst() { if (reduce) return; const b = $('#burst'); b.innerHTML = ''; 
 
 </script>
 
-<div hidden><div id="cpAd" class="cpad"><iframe src="https://ads-partners.coupang.com/widgets.html?id=1047718&template=carousel&trackingCode=AF4687884&subId=&width=360&height=120&tsource=" width="100%" height="120" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" loading="lazy" title="쿠팡 추천 상품"></iframe><p>이 사이트는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p></div></div>
-<style>.cpad{flex:0 0 100%;margin:16px 0 4px}.cpad iframe{display:block;width:100%;height:120px;border:0;border-radius:12px;background:var(--glass-soft)}.cpad p{font-size:10px;color:var(--ink-faint);text-align:center;margin:6px 0 0;line-height:1.45}</style>
-<script>(function(){var ad=document.getElementById('cpAd'),n=document.getElementById('names');if(!ad||!n)return;var mo;function place(){var t=n.querySelector('.tail');if(ad.parentNode===n&&ad.nextSibling===t)return;mo.disconnect();if(t)n.insertBefore(ad,t);else n.appendChild(ad);mo.observe(n,{childList:true});}mo=new MutationObserver(place);mo.observe(n,{childList:true});place();})();</script>
+<div id="cpAd" class="cpbar"><div class="cpin"><iframe src="https://ads-partners.coupang.com/widgets.html?id=1047718&template=carousel&trackingCode=AF4687884&subId=&width=360&height=60&tsource=" width="100%" height="60" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" title="쿠팡 추천 상품"></iframe><p>이 사이트는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p></div></div>
+<style>:root{--adh:0px}body.hasad{--adh:calc(80px + env(safe-area-inset-bottom,0px))}body.hasad #gl{height:calc(100% - var(--adh))}.cpbar{position:fixed;left:0;right:0;bottom:0;z-index:3;height:var(--adh);box-sizing:border-box;padding:4px max(10px,env(safe-area-inset-left,0px)) env(safe-area-inset-bottom,0px);background:var(--glass-soft);border-top:1px solid var(--edge);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}.cpin{max-width:560px;margin:0 auto}.cpbar iframe{display:block;width:100%;height:60px;border:0;border-radius:10px}.cpbar p{font-size:9px;color:var(--ink-faint);text-align:center;margin:2px 0 0;line-height:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}body.hasad .caption{bottom:calc(84px + var(--adh))}body.hasad .chev{bottom:calc(24px + var(--adh))}body.hasad .sheet{bottom:calc(82px + var(--adh));max-height:calc(52vh - 40px)}body.hasad .tip{bottom:calc(36px + var(--adh))}body.hasad #tip2{bottom:calc(174px + var(--adh))}body.hasad .tip.btip{bottom:auto}</style>
+<script>document.body.classList.add('hasad');dispatchEvent(new Event('resize'));</script>
 </body>
 </html>
