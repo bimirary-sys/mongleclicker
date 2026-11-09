@@ -2116,10 +2116,10 @@ function requestReward(onReady) {
 let lockFor = null;
 function closeLock() { $('#lockDlg').hidden = true; $('#lockScrim').hidden = true; lockFor = null; }
 /* d: the clicker that was tapped (or null from the list bar); g: its category key */
-function askUnlock(d, vi = 0, g = d && grpOf(d)) {
+function askUnlock(d, vi = 0, g = d && grpOf(d), later = null) {
   if (sheetOpen) toggleSheet(false);
   const first = !firstDone, gs = first ? [...new Set([...BONUS, g])] : [g];
-  lockFor = { d, vi, g }; const target = lockFor, go = $('#lockGo');
+  lockFor = { d, vi, g, later }; const target = lockFor, go = $('#lockGo');
   $('#lockT').textContent = d ? `${d.ko} 🔒` : `${GROUP_KO[g]} 🔒`;
   $('#lockP').innerHTML = first ? `광고 보고 <b>${joinKo(gs)}</b><br>24시간 동안 잠금해제<small class="lkn">다음 카테고리도 언제든지 광고 보고 잠금해제할 수 있어요</small>`
     : `광고 보고 <b>${GROUP_KO[g]}</b> 모두 잠금해제<small class="lkn">24시간 동안 열려 있어요</small>`;
@@ -2133,7 +2133,7 @@ function askUnlock(d, vi = 0, g = d && grpOf(d)) {
       closeLock(); toast(`${joinKo(gs)} 잠금해제! 24시간 동안 열려 있어요 ✦`, 3200); if (d) show(d.id, vi); renderNames();
     }
     else if (r === 'noad') { closeLock(); if (d) { passes.add(d.id); toast('지금은 광고가 없어서 그냥 열어드릴게요'); show(d.id, vi); } else toast('지금은 볼 수 있는 광고가 없어요. 잠시 후 다시 해주세요'); }
-    else { $('#lockP').innerHTML = '광고를 끝까지 보면 열려요<br>다시 해볼까요?'; go.disabled = false; go.textContent = '다시 시도'; go.onclick = () => { closeLock(); askUnlock(d, vi, g); }; }
+    else { $('#lockP').innerHTML = '광고를 끝까지 보면 열려요<br>다시 해볼까요?'; go.disabled = false; go.textContent = '다시 시도'; go.onclick = () => { closeLock(); askUnlock(d, vi, g, later); }; }
   });
 }
 const canvas = document.getElementById('gl');
@@ -2411,7 +2411,12 @@ $('.brand').addEventListener('click', () => { const t = performance.now(); brand
 // touching the clicker to look closer pauses the auto-advance
 document.getElementById('gl').addEventListener('pointerdown', () => { if (chkOn && chkT) chkAuto(false); });
 /* ‹ › beside the caption name: step through every clicker in menu order */
-function stepClicker(dir) { if (chkOn) { chkAuto(false); return chkGo(chkI + dir); } initAudio(); uiTick(); hideTip(); const i = cur ? CLICKERS.findIndex(c => c.id === cur.def.id) : -1; let j = i, d; for (let n = 0; n < CLICKERS.length; n++) { j = (j + dir + CLICKERS.length) % CLICKERS.length; d = CLICKERS[j]; if (!isLocked(d)) break; } show(d.id, 0); }
+function stepClicker(dir) { if (chkOn) { chkAuto(false); return chkGo(chkI + dir); } initAudio(); uiTick(); hideTip(); const i = cur ? CLICKERS.findIndex(c => c.id === cur.def.id) : -1; const n = CLICKERS.length; let j = i, d = null, skipped = null, wrapped = false;
+  for (let k = 0; k < n; k++) { j += dir; if (j < 0 || j >= n) { wrapped = true; j = (j + n) % n; } const c = CLICKERS[j]; if (isLocked(c)) { skipped = skipped || c; continue; } d = c; break; }
+  if (!d) return;
+  /* free clickers run in a loop; locked ones are skipped quietly, but going round past the end offers the unlock first (다음에 → carry on to the next free one) */
+  if (wrapped && skipped) { askUnlock(skipped, 0, grpOf(skipped), () => show(d.id, 0)); return; }
+  show(d.id, 0); }
 $('#navPrev').addEventListener('click', () => stepClicker(-1));
 $('#navNext').addEventListener('click', () => stepClicker(1));
 addEventListener('keydown', e => { if (sheetOpen || e.target.closest?.('input, textarea')) return; if (e.key === 'ArrowLeft') stepClicker(-1); else if (e.key === 'ArrowRight') stepClicker(1); });
@@ -2424,8 +2429,9 @@ $('#backBtn').addEventListener('click', () => { if (!hist.length) return; initAu
 function setDrawer(open) { if (!open) hideBackTip(); $('#drawer').classList.toggle('open', open); $('#moreBtn').setAttribute('aria-expanded', open); $('#moreBtn').setAttribute('aria-label', open ? '찜·랜덤박스 접기' : '찜·랜덤박스 펼치기'); }
 $('#moreBtn').addEventListener('click', () => { initAudio(); uiTick(); const open = !$('#drawer').classList.contains('open'); setDrawer(open); if (!open) hideBackTip(); else if (!backTipShown) { backTipShown = true; const t = $('#backTip'); setTimeout(() => { t.hidden = false; t.classList.remove('bye'); backTipTO = setTimeout(hideBackTip, 4500); }, 380); } });
 document.addEventListener('pointerdown', e => { if ($('#drawer').classList.contains('open') && !e.target.closest('.side')) setDrawer(false); });
-$('#lockNo').addEventListener('click', () => { uiTick(); closeLock(); });
-$('#lockScrim').addEventListener('click', closeLock);
+function lockLater() { const l = lockFor && lockFor.later; closeLock(); if (l) l(); }
+$('#lockNo').addEventListener('click', () => { uiTick(); lockLater(); });
+$('#lockScrim').addEventListener('click', lockLater);
 /* random box: rattles, then pops out a random clicker */
 let fromRandom = false, rolling = false; const randBtn = $('#rand');
 randBtn.addEventListener('click', () => {
