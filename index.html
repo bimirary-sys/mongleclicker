@@ -271,6 +271,8 @@ body.empty .drawer { display: none; }
 .fav.pop { animation: boing .5s cubic-bezier(.3, 1.8, .5, 1); }
 .cnt { justify-self: start; margin-top: 9px; display: inline-flex; align-items: center; padding: 0 1px; font-family: var(--f-round); font-size: 11.5px; letter-spacing: .04em; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
 .cnt.mile { animation: mile 1.2s ease-out; }
+.toyb { justify-self: start; margin-top: 8px; display: inline-flex; align-items: center; gap: 4px; padding: 6px 11px 6px 9px; border-radius: 999px; background: rgba(255,255,255,.72); box-shadow: 0 2px 10px rgba(120,90,150,.12); font-family: var(--f-round); font-size: 12px; letter-spacing: .02em; color: var(--ink); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.toyb:active { transform: scale(.96); }
 @keyframes mile { 0% { color: var(--accent); transform: scale(1.5); text-shadow: 0 0 12px var(--accent); } 100% { transform: none; } }
 .cat.special span { color: var(--accent); }
 .empty-note { margin: 6px 4px; font-size: 12.5px; color: var(--ink-soft); }
@@ -297,7 +299,7 @@ body:not(.ready) #gl { opacity: 0; } #gl { transition: opacity .6s; }
 <div id="burst" aria-hidden="true"></div>
 
 <header class="top">
-  <div class="brand"><b>mongle <span>clicker</span></b><small>pocket clickers in the clouds</small><span class="cnt" id="cnt">눌러보세요</span></div>
+  <div class="brand"><b>mongle <span>clicker</span></b><small>pocket clickers in the clouds</small><span class="cnt" id="cnt">눌러보세요</span><a class="toyb" href="/" aria-label="복복이 장난감상자로 가기">🧸 장난감상자</a></div>
   <div class="side">
   <div class="tools">
     <button class="pill" id="swBtn" aria-haspopup="true" aria-expanded="false" aria-controls="swPop"><i class="dot"></i><span id="swName">크림치즈축</span></button>
