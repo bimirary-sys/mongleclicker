@@ -2254,7 +2254,7 @@ const chain = (() => {
   return {
     setStyle(s) { const st = styles[s] || styles.ball; beads.material = mat(st[0], st[1]); },
     hide() { g.visible = false; },
-    reset(a) { out.subVectors(a, root.position).normalize(); for (let i = 0; i < N; i++) { pts[i].copy(a).addScaledVector(out, i * seg * .9); old[i].copy(pts[i]); } g.visible = true; },
+    reset(a) { out.subVectors(a, root.position).normalize(); for (let i = 0; i < N; i++) { pts[i].copy(a).addScaledVector(out, i * seg * .9); old[i].copy(pts[i]); } g.visible = !/nochain/.test(location.search); },
     step(dt, a, ctr, R) {
       // zero-g & rigid: the chain keeps one fixed floating pose in the clicker's own frame,
       // so it turns together with the figure and never swings while you handle it
