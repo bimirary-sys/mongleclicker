@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="description" content="손끝으로 딸깍딸깍! 몽글몽글한 3D 클리커를 골라 눌러보는 스트레스 해소 놀이터. 키캡, 디저트, 미니어처, 질감 키보드까지 90여 가지 클리커를 무료로 즐겨보세요.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="몽글클리커">
@@ -42,7 +42,7 @@
 :root[data-theme="dark"] {
   --sky-a: #211d33; --sky-b: #2a2442; --sky-c: #34263f; --ink: #f1eaf7; --ink-soft: rgba(241, 234, 247, .62); --ink-faint: rgba(241, 234, 247, .3);
   --glass: rgba(60, 50, 88, .42); --glass-soft: rgba(60, 50, 88, .2); --glass-hi: rgba(90, 78, 125, .62); --edge: rgba(255, 255, 255, .22); --cloud: rgba(170, 150, 220, .28); --shadow: rgba(0, 0, 0, .45); --accent: #f3a6c0; --film: rgba(255, 255, 255, .18); color-scheme: dark; }
-html, body { height: 100%; }
+html, body { height: 100%; touch-action: manipulation; }
 body { margin: 0; overflow: hidden; background: var(--sky-a); color: var(--ink); font-family: var(--f-ui); -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; overscroll-behavior: none; }
 button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; padding: 0; }
 button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
@@ -2342,6 +2342,7 @@ canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 canvas.addEventListener('wheel', e => { e.preventDefault(); zoomT = THREE.MathUtils.clamp(zoomT * Math.exp(e.deltaY * .0012), .42, 2.3); }, { passive: false });
 ['gesturestart', 'gesturechange'].forEach(t => document.addEventListener(t, e => e.preventDefault()));
+(() => { const vv = window.visualViewport; if (!vv) return; const b = document.createElement('button'); b.textContent = '화면 원래대로'; b.style.cssText = 'position:fixed;z-index:9999;padding:10px 18px;border:0;border-radius:999px;background:rgba(40,30,60,.85);color:#fff;font:600 15px/1 sans-serif;display:none;touch-action:manipulation;transform-origin:top center'; document.body.appendChild(b); const vp = document.querySelector('meta[name=viewport]'); const base = vp.content; b.addEventListener('click', () => { vp.content = 'width=device-width, initial-scale=1.0001, maximum-scale=1, user-scalable=no, viewport-fit=cover'; setTimeout(() => { vp.content = base; }, 350); window.scrollTo(0, 0); }); const chk = () => { const z = vv.scale > 1.05; b.style.display = z ? 'block' : 'none'; if (z) { b.style.left = (vv.offsetLeft + vv.width / 2) + 'px'; b.style.top = (vv.offsetTop + 14) + 'px'; b.style.transform = 'translateX(-50%) scale(' + (1 / vv.scale) + ')'; } }; vv.addEventListener('resize', chk); vv.addEventListener('scroll', chk); })();
 let resetting = 0; function resetView() { resetting = 1; angVel.set(0, 0, 0); zoomT = 1; }
 
 /* ---------- loop ---------- */
